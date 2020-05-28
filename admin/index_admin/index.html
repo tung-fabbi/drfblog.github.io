@@ -22,13 +22,13 @@
         <div class="navbar-nav">
             <a class="nav-item nav-link active" href="https://drfblog.github.io/admin/index_admin">Quản lý bài viết</a>
             <a class="nav-item nav-link" href="https://drfblog.github.io/admin/category_list">Quản lý nhóm bài viết</a>
-            <a class="nav-item nav-link" href="https://drfblog.github.io/media">Quản lý ảnh bài viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/media">Quản lý ảnh bài viết</a>
         </div>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
                     <img v-if="user.body.author_photo" class="rounded-circle z-depth-2" style="width:60px;height: 60px;"
-                         :src="API_URL+'/' + user.body.author_photo">
+                         :src="user.body.author_photo">
                     <img v-else class="rounded-circle" style="width:60px" src="user.svg">
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
@@ -153,7 +153,7 @@
                         {method: 'DELETE'});
                     var result = await resp.json();
                     if (result.body.success) {
-                        location.href = 'https://drfblog.github.io/admin';
+                        location.href = 'https://drfblog.github.io/admin/index_admin';
                         alert('Xóa Thành công')
                     } else {
                         alert('Lỗi khi xóa ');
