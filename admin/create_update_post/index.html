@@ -2,7 +2,8 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.css">
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="plugin/tinymce/skins/lightgray/content.min.css"></script>
 <script>
     if (!sessionStorage.getItem('token')) {
         location.href = 'https://drfblog.github.io/admin';
@@ -20,7 +21,7 @@
 <script type="text/javascript" src="plugin/tinymce/init-tinymce.js"></script>
 
 <div id='app'>
-        <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
+    <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
         <div class="navbar-nav">
             <a class="nav-item nav-link active" href="https://drfblog.github.io/admin/index_admin">Quản lý bài viết</a>
             <a class="nav-item nav-link" href="https://drfblog.github.io/admin/category_list">Quản lý nhóm bài viết</a>
@@ -66,20 +67,16 @@
 
                     <td><img v-if="posts.body.thumbnail" :src="posts.body.thumbnail" class="form"
                              style="width: 100px;"><br v-if="posts.body.thumbnail">
-                        <input class="formData mt-3" id='image' type="file" @change="updateImage($event)"
-                               name="thumbnail">
+                        <input class="formData mt-3" id='image' type="file" @change="updateImage($event)" name="thumbnail">
                     </td>
                 </tr>
                 <tr>
                     <th>nhóm bài viết:</th>
                     <td>
-
                         <select v-model='selected' multiple class="form-control">
-                            <option v-for="c in cate.body" style="width: 150px;" v-bind:value="c.id" name>{{ c.title
-                                }}
+                            <option v-for="c in cate.body" style="width: 150px;" v-bind:value="c.id" name>{{ c.title }}
                             </option>
                         </select>
-
                     </td>
                 </tr>
             </table>
@@ -94,7 +91,6 @@
         </form>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
 <script>
     new Vue({
@@ -159,7 +155,7 @@
                 var user = await user.json();
                 if (!user.body.author_id) {
                     alert('Bạn hãy điền đủ thông tin cá nhân');
-                     location.href = 'https://drfblog.github.io/admin/index_admin';
+                    location.href = 'https://drfblog.github.io/admin/index_admin';
                 } else {
                     this.author = user.body.author_id
                     this.author_name = user.body.author_name
@@ -181,9 +177,6 @@
                 return resp.json();
             },
             put: async function (url, body) {
-                // for (var pair of body.entries()) {
-                //     console.log(pair[0] + ', ' + pair[1]);
-                // }
                 var resp = await fetch(url, {
                     method: 'PUT',
                     body: body,
@@ -210,10 +203,9 @@
                 } else {
                     data.append("author", this.author);
                     result = await this.post(this.API_URL + '/root/create_post', data);
-                    console.log(result)
                 }
                 if (result.body.success) {
-                     location.href = 'https://drfblog.github.io/admin/index_admin';
+                    location.href = 'https://drfblog.github.io/admin/index_admin';
                     alert("Thành công")
                 } else {
                     alert('Lỗi xảy ra khi ghi dữ liệu');
@@ -230,7 +222,7 @@
                 this.user = await resp.json()
                 if (this.user.body.success === false) {
                     sessionStorage.removeItem('token');
-                     location.href = 'https://drfblog.github.io/admin';
+                    location.href = 'https://drfblog.github.io/admin';
                 }
             },
 
