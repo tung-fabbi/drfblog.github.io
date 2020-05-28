@@ -1,1 +1,239 @@
-<h1>create_update_post</h1>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    if (!sessionStorage.getItem('token')) {
+        location.href = 'https://drfblog.github.io/admin';
+    }
+
+    function logOut() {
+        sessionStorage.removeItem('token');
+        location.href = 'https://drfblog.github.io/admin';
+    }
+</script>
+
+<!-- javascript -->
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="plugin/tinymce/tinymce.min.js"></script>
+<script type="text/javascript" src="plugin/tinymce/init-tinymce.js"></script>
+
+<div id='app'>
+        <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="https://drfblog.github.io/admin/index_admin">Quản lý bài viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/category_list">Quản lý nhóm bài viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/media">Quản lý ảnh bài viết</a>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+                    <img class="rounded-circle" style="width:60px" src="user.svg">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="https://drfblog.github.io/admin/user_profile">
+                        Thông tin tài khoản
+                    </a>
+                    <a class="dropdown-item" href="https://drfblog.github.io/admin/change_password">
+                        Đổi mật khẩu
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" onclick="logOut()">
+                        Đăng xuất
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="container">
+        <form id='fmt'>
+            <table class="table">
+                <tr>
+                    <th>Tác giả :</th>
+                    <th><p class="form-control" style="color: blue;">{{ author_name }}</p></th>
+                </tr>
+                <tr>
+                    <th>Tiêu đề:</th>
+                    <td><input class="form-control" v-model='posts.body.title' name="title"></td>
+                </tr>
+                <tr>
+                    <th>Miêu tả:</th>
+                    <td><input class="form-control" v-model='posts.body.sapo' name="sapo"></td>
+                </tr>
+                <tr>
+                    <th>Hình ảnh nền:</th>
+
+                    <td><img v-if="posts.body.thumbnail" :src="posts.body.thumbnail" class="form"
+                             style="width: 100px;"><br v-if="posts.body.thumbnail">
+                        <input class="formData mt-3" id='image' type="file" @change="updateImage($event)"
+                               name="thumbnail">
+                    </td>
+                </tr>
+                <tr>
+                    <th>nhóm bài viết:</th>
+                    <td>
+
+                        <select v-model='selected' multiple class="form-control">
+                            <option v-for="c in cate.body" style="width: 150px;" v-bind:value="c.id" name>{{ c.title
+                                }}
+                            </option>
+                        </select>
+
+                    </td>
+                </tr>
+            </table>
+            <div>
+                <h4>Nội dung :</h4>
+                <textarea class="tinymce" v-model="posts.body.content" id="texteditor"></textarea>
+            </div>
+            <div class="mt-3">
+                <a class='btn btn-secondary' href='https://drfblog.github.io/admin/index_admin'>Quay lại</a>
+                <button v-on:click='save()' class="btn btn-primary" type="button">Lưu lại</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            selected: [],
+            id: null,
+            cate: [],
+            author_name: "",
+            updata_thumbnail: "",
+            posts: {
+                body: {
+                    author: "",
+                    categories: "",
+                    content: "",
+                    sapo: "",
+                    thumbnail: "",
+                    title: "",
+                },
+            },
+            user: {
+                body: {
+                    author_photo: "",
+                    author_id: ""
+                }
+            },
+            API_URL: 'https://drfblog.herokuapp.com'
+        },
+        created: async function () {
+            var pos = location.href.indexOf('?id=');
+            this.id = (pos > 0) ? location.href.substring(pos + 4) : null;
+            if (this.id) {
+                var resp = await fetch(this.API_URL + "/root/get_post/" + this.id);
+                this.posts = await resp.json();
+
+                var resp = await fetch(this.API_URL + "/root/get_all_categories");
+                this.cate = await resp.json();
+
+                var author = await fetch(this.API_URL + "/root/get_author/" + this.posts.body.author,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer '
+                                + sessionStorage.getItem('token')
+                        }
+                    }
+                )
+                var author = await author.json();
+                this.author_name = author.body.author_name
+                this.selected = this.posts.body.categories
+                console.log(this.posts)
+            } else {
+                var resp = await fetch(this.API_URL + "/root/get_all_categories");
+                this.cate = await resp.json();
+                console.log(this.cate)
+                var user = await fetch(this.API_URL + "/root/get_user",
+                    {
+                        headers: {
+                            'Authorization': 'Bearer '
+                                + sessionStorage.getItem('token')
+                        }
+                    });
+                var user = await user.json();
+                if (!user.body.author_id) {
+                    alert('Bạn hãy điền đủ thông tin cá nhân');
+                     location.href = 'https://drfblog.github.io/admin/index_admin';
+                } else {
+                    this.author = user.body.author_id
+                    this.author_name = user.body.author_name
+
+                }
+            }
+            await this.getUser()
+        },
+        methods: {
+            post: async function (url, formData) {
+                var resp = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': 'Bearer '
+                            + sessionStorage.getItem('token')
+                    },
+                });
+                return resp.json();
+            },
+            put: async function (url, body) {
+                // for (var pair of body.entries()) {
+                //     console.log(pair[0] + ', ' + pair[1]);
+                // }
+                var resp = await fetch(url, {
+                    method: 'PUT',
+                    body: body,
+                    headers: {
+                        'Authorization': 'Bearer '
+                            + sessionStorage.getItem('token')
+                    }
+                });
+                return resp.json();
+            },
+            updateImage: function (ev) {
+                this.updata_thumbnail = ev.target.files[0];
+            },
+            save: async function () {
+                var result = {};
+                var fmt = document.getElementById('fmt');
+                var data = new FormData(fmt)
+                var content = tinymce.get("texteditor").getContent();
+                data.append("content", content);
+                data.append("categories", this.selected);
+                if (this.id) {
+                    data.append("author", this.posts.body.author);
+                    result = await this.put(this.API_URL + '/root/update_post/' + this.id, data);
+                } else {
+                    data.append("author", this.author);
+                    result = await this.post(this.API_URL + '/root/create_post', data);
+                    console.log(result)
+                }
+                if (result.body.success) {
+                     location.href = 'https://drfblog.github.io/admin/index_admin';
+                    alert("Thành công")
+                } else {
+                    alert('Lỗi xảy ra khi ghi dữ liệu');
+                }
+            },
+            getUser: async function () {
+                var resp = await fetch(this.API_URL + "/root/get_user",
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
+                            "Content-Type": "application/json",
+                        }
+                    });
+                this.user = await resp.json()
+                if (this.user.body.success === false) {
+                    sessionStorage.removeItem('token');
+                     location.href = 'https://drfblog.github.io/admin';
+                }
+            },
+
+        }
+    })
+</script>

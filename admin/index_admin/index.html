@@ -31,7 +31,6 @@
 <!--                         :src="user.body.author_photo">-->
 <!--                    <img v-else class="rounded-circle" style="width:60px" src="user.svg">-->
                     <img class="rounded-circle" style="width:60px" src="user.svg">
-                    {{user.body.author_photo}}
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="https://drfblog.github.io/admin/user_profile">
@@ -77,7 +76,7 @@
                     <td><p v-for='c in p.categories'>{{ c.title }}</p></td>
                     <td><img :src="p.thumbnail" class="product-image" style="width: 200px;"/></td>
                     <td class="text-center" style="width: 200px;">
-                        <a class="btn btn-sm btn-primary" :href='"create_update_post.html?id=" + p.id'
+                        <a class="btn btn-sm btn-primary" :href='"https://drfblog.github.io/admin/create_update_post?id=" + p.id'
                            style="margin-bottom: 5px;">Chỉnh sửa</a>
                         <a class="btn btn-sm btn-danger" v-on:click="deleteCategory(p.id)" href='#'
                            style="margin-bottom: 5px;">Xóa</a>
@@ -155,8 +154,8 @@
                         {method: 'DELETE'});
                     var result = await resp.json();
                     if (result.body.success) {
-                        location.href = 'https://drfblog.github.io/admin/index_admin';
                         alert('Xóa Thành công')
+                        location.href = 'https://drfblog.github.io/admin/index_admin';
                     } else {
                         alert('Lỗi khi xóa ');
                     }
@@ -166,7 +165,6 @@
             },
             search: async function () {
                 var url = this.API_URL + "/root/get_post_list?search=" + encodeURI(this.keyword);
-                console.log(url);
                 await this.getListPosts(url);
             },
         },
