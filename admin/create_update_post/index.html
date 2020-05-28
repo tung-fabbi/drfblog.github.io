@@ -104,7 +104,7 @@
                 body: {
                     author: "",
                     categories: "",
-                    content: "",
+                    content: "content",
                     sapo: "",
                     thumbnail: "",
                     title: "",
@@ -131,15 +131,13 @@
                 var author = await fetch(this.API_URL + "/root/get_author/" + this.posts.body.author,
                     {
                         headers: {
-                            'Authorization': 'Bearer '
-                                + sessionStorage.getItem('token')
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                         }
                     }
                 )
                 var author = await author.json();
                 this.author_name = author.body.author_name
                 this.selected = this.posts.body.categories
-                console.log(this.posts)
             } else {
                 var resp = await fetch(this.API_URL + "/root/get_all_categories");
                 this.cate = await resp.json();
