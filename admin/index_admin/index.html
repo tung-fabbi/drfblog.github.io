@@ -1,0 +1,173 @@
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.css">
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="http://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<link type="text/css" rel="stylesheet" href="http://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+<link type="text/css" rel="stylesheet" href="http:unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    if (!sessionStorage.getItem('token')) {
+        location.href = 'login.html';
+    }
+
+    function logOut() {
+        sessionStorage.removeItem('token');
+        location.href = 'login.html';
+    }
+</script>
+<div id='app' v-if="user.body.author_id">
+    <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="index_admin.html">Quản lý bài viết</a>
+            <a class="nav-item nav-link" href="category_list.html">Quản lý nhóm bài viết</a>
+            <a class="nav-item nav-link" href="media.html">Quản lý ảnh bài viết</a>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+                    <img v-if="user.body.author_photo" class="rounded-circle z-depth-2" style="width:60px;height: 60px;"
+                         :src="API_URL+'/' + user.body.author_photo">
+                    <img v-else class="rounded-circle" style="width:60px" src="user.svg">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="user_profile.html">
+                        Thông tin tài khoản
+                    </a>
+                    <a class="dropdown-item" href="change_password.html">
+                        Đổi mật khẩu
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" onclick="logOut()">
+                        Đăng xuất
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="mt-3 container">
+        <template>
+            <div>
+                <a class="btn btn-primary" href="create_update_post.html"
+                   style="margin-bottom: 5px;width: 329px;;margin-right: 10px;">
+                    Thêm bài viết
+                </a>
+                <form id='seh' @submit.prevent="search()">
+                    <input class="form-control" v-model="keyword" type="text" placeholder="Tìm kiếm" aria-label="Search"
+                           style="width: 40%;margin-right: 10px;float: left;">
+                </form>
+                <p class="h5 text-right">{{paging.count}} bài viết</p>
+            </div>
+            <table class="table table-bordered">
+                <tr class="text-center">
+                    <th style="width: 10%;">STT</th>
+                    <th style="width: 20%;">Tiêu đề</th>
+                    <th style="width: 20%;">Miêu tả</th>
+                    <th style="width: 10%;">Nhóm bài viết</th>
+                    <th style="width: 20%;">Ảnh</th>
+                    <th style="width: 20%;"></th>
+                </tr>
+                <tr v-for='(p,i) in posts.body' class="text-center">
+                    <td>{{ i+1}}</td>
+                    <td>{{ p.title }}</td>
+                    <td>{{ p.sapo }}</td>
+                    <td><p v-for='c in p.categories'>{{ c.title }}</p></td>
+                    <td><img :src="p.thumbnail" class="product-image" style="width: 200px;"/></td>
+                    <td class="text-center" style="width: 200px;">
+                        <a class="btn btn-sm btn-primary" :href='"create_update_post.html?id=" + p.id'
+                           style="margin-bottom: 5px;">Chỉnh sửa</a>
+                        <a class="btn btn-sm btn-danger" v-on:click="deleteCategory(p.id)" href='#'
+                           style="margin-bottom: 5px;">Xóa</a>
+                    </td>
+                </tr>
+            </table>
+            <b-pagination v-model="paging.currentPage" :total-rows="paging.count" :per-page="perPage"
+                          v-on:input="getListPosts(url2+paging.currentPage)">
+            </b-pagination>
+            <p class="mt-3">Trang hiện tại: {{ paging.currentPage }}</p>
+        </template>
+    </div>
+</div>
+
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                keyword: '',
+                perPage: 5,
+                paging: {
+                    currentPage: "1",
+                    count: "",
+                    previous: "",
+                    next: "",
+                    total_page: "",
+                },
+                posts: [],
+                API_URL: 'https://drfblog.herokuapp.com',
+                url: "https://drfblog.herokuapp.com/root/get_post_list",
+                url2: "https://drfblog.herokuapp.com/root/get_post_list?page=",
+                user: {
+                    body: {
+                        author_photo: "",
+                        author_id: "",
+                    }
+                }
+            }
+        },
+        created: async function () {
+            await this.getListPosts(this.url);
+            await this.getUser()
+
+        },
+        methods: {
+            getUser: async function () {
+                var resp = await fetch(this.API_URL + "/root/get_user",
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
+                            "Content-Type": "application/json",
+                        }
+                    });
+                this.user = await resp.json();
+                if (this.user.body.success === false) {
+                    sessionStorage.removeItem('token');
+                    location.href = 'login.html';
+                    alert('Tài khoản không được phép truy cập vui lòng liên hệ admin để được hỗ trợ')
+                }
+            },
+            getListPosts: async function (url) {
+                var resp = await fetch(url,
+                    {
+                        headers: {'Authorization': 'Bearer ' + sessionStorage.getItem('token')}
+                    });
+                this.posts = await resp.json();
+                this.paging = this.posts.paging
+                this.url = this.url2 + this.paging.currentPage
+            },
+            deleteCategory: async function (id) {
+                if (confirm("Bạn có thực sự muốn xóa !")) {
+                    var resp = await fetch(this.API_URL + '/root/delete_post/' + id,
+                        {method: 'DELETE'});
+                    var result = await resp.json();
+                    if (result.body.success) {
+                        location.href = 'index_admin.html';
+                        alert('Xóa Thành công')
+                    } else {
+                        alert('Lỗi khi xóa ');
+                    }
+                    ;
+                }
+                ;
+            },
+            search: async function () {
+                var url = this.API_URL + "/root/get_post_list?search=" + encodeURI(this.keyword);
+                console.log(url);
+                await this.getListPosts(url);
+            },
+        },
+
+    })
+</script>
