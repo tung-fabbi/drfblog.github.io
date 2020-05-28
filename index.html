@@ -220,7 +220,7 @@
             getCategories: async function () {
                 var resp = await fetch(this.API_URL + '/get_categories')
                 this.categories = await resp.json()
-                // console.log(this.categories)
+                // console.log(this.category_list)
             },
             getPost: async function (id) {
                 location.href = 'post?id=' + id;
