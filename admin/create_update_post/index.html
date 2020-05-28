@@ -121,10 +121,11 @@
         created: async function () {
             var pos = location.href.indexOf('?id=');
             this.id = (pos > 0) ? location.href.substring(pos + 4) : null;
-            if (this.id) {
+              if (this.id) {
                 var resp = await fetch(this.API_URL + "/root/get_post/" + this.id);
                 this.posts = await resp.json();
-
+              }
+            if (this.id) {
                 var resp = await fetch(this.API_URL + "/root/get_all_categories");
                 this.cate = await resp.json();
 
