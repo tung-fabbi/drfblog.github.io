@@ -121,7 +121,7 @@
             if (this.id) {
                 var resp = await fetch(this.API_URL + "/root/get_post/" + this.id);
                 this.posts = await resp.json();
-
+                tinymce.get("texteditor").setContent(this.posts.body.content);
                 var resp = await fetch(this.API_URL + "/root/get_all_categories");
                 this.cate = await resp.json();
 
