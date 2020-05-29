@@ -138,7 +138,7 @@
                 this.user = await resp.json();
                 if (this.user.body.success === false) {
                     sessionStorage.removeItem('token');
-                    location.href = 'login.html';
+                    location.href = 'https://drfblog.github.io';
                     alert('Tài khoản không được phép truy cập vui lòng liên hệ admin để được hỗ trợ')
                 }
             },
