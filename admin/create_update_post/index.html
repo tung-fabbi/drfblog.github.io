@@ -14,7 +14,6 @@
 </script>
 
 <!-- javascript -->
-<link rel="stylesheet" href="plugin/tinymce/skins/lightgray/skin.min.css" >
 <div id='app'>
     <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
         <div class="navbar-nav">
@@ -80,7 +79,7 @@
             <div>
                 <h4>Nội dung :</h4>
                 {{posts.body.content}}
-                <textarea class="tinymce" v-model="posts.body.content" id="texteditor"></textarea>
+                <textarea v-model="posts.body.content" class="tinymce" id="texteditor"></textarea>
             </div>
             <div class="mt-3">
                 <a class='btn btn-secondary' href='https://drfblog.github.io/admin/index_admin'>Quay lại</a>
