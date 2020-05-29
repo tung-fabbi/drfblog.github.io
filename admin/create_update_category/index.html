@@ -4,6 +4,7 @@
 <script src="js/jquery-3.3.1.slim.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/vue.js"></script>
+<link rel="icon" type="image/png" href="icon.png"/>
 <script>
     if (!sessionStorage.getItem('token')) {
         location.href = 'https://drfblog.github.io/admin';
@@ -143,7 +144,7 @@
                 }
                 if (result.body.success) {
                     location.href = 'https://drfblog.github.io/admin/category_list';
-                     alert('Thành công');
+                    alert('Thành công');
                 } else {
                     alert('Lỗi xảy ra khi ghi dữ liệu');
                 }
