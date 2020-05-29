@@ -1,6 +1,6 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="js/bootstrap.css">
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="js/vue.js"></script>
 <script src="js/bootstap-vue.min.js"></script>
 <link type="text/css" rel="stylesheet" href="js/bootstap.min.css"/>
 <link type="text/css" rel="stylesheet" href="js/bootstrap-vue.min.css"/>
@@ -22,15 +22,16 @@
         <div class="navbar-nav">
             <a class="nav-item nav-link active" href="https://drfblog.github.io/admin/index_admin">Quản lý bài viết</a>
             <a class="nav-item nav-link" href="https://drfblog.github.io/admin/category_list">Quản lý nhóm bài viết</a>
-            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/media" target="_blank">Quản lý ảnh bài viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/media" target="_blank">Quản lý ảnh bài
+                viết</a>
             <a class="nav-item nav-link" href="https://drfblog.github.io" target="_blank">drfblog</a>
         </div>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
-<!--                    <img v-if="user.body.author_photo" class="rounded-circle z-depth-2" style="width:60px;height: 60px;"-->
-<!--                         :src="user.body.author_photo">-->
-<!--                    <img v-else class="rounded-circle" style="width:60px" src="user.svg">-->
+                    <!--                    <img v-if="user.body.author_photo" class="rounded-circle z-depth-2" style="width:60px;height: 60px;"-->
+                    <!--                         :src="user.body.author_photo">-->
+                    <!--                    <img v-else class="rounded-circle" style="width:60px" src="user.svg">-->
                     <img class="rounded-circle" style="width:60px" src="user.svg">
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
@@ -77,7 +78,8 @@
                     <td><p v-for='c in p.categories'>{{ c.title }}</p></td>
                     <td><img :src="p.thumbnail" class="product-image" style="width: 200px;"/></td>
                     <td class="text-center" style="width: 200px;">
-                        <a class="btn btn-sm btn-primary" :href='"https://drfblog.github.io/admin/create_update_post?id=" + p.id'
+                        <a class="btn btn-sm btn-primary"
+                           :href='"https://drfblog.github.io/admin/create_update_post?id=" + p.id'
                            style="margin-bottom: 5px;">Chỉnh sửa</a>
                         <a class="btn btn-sm btn-danger" v-on:click="deleteCategory(p.id)" href='#'
                            style="margin-bottom: 5px;">Xóa</a>

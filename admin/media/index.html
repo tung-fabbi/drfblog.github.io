@@ -1,1 +1,189 @@
-<h1>media</h1>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="js/bootstrap.css">
+<script src="js/vue.js"></script>
+<script src="js/bootstap-vue.min.js"></script>
+<link type="text/css" rel="stylesheet" href="js/bootstap.min.css"/>
+<link type="text/css" rel="stylesheet" href="js/bootstrap-vue.min.css"/>
+<script src="js/jquery-3.3.1.slim.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script>
+    if (!sessionStorage.getItem('token')) {
+        location.href = 'https://drfblog.github.io/admin';
+    }
+
+    function logOut() {
+        sessionStorage.removeItem('token');
+        location.href = 'https://drfblog.github.io/admin';
+    }
+</script>
+<div id ='app' v-if="user.body.author_id">
+   <nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #1f282dd9">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/index_admin">Quản lý bài viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io/admin/category_list">Quản lý nhóm bài viết</a>
+            <a class="nav-item nav-link active" href="https://drfblog.github.io/admin/media" target="_blank">Quản lý ảnh bài
+                viết</a>
+            <a class="nav-item nav-link" href="https://drfblog.github.io" target="_blank">drfblog</a>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+                    <img class="rounded-circle" style="width:60px" src="user.svg">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="https://drfblog.github.io/admin/user_profile">
+                        Thông tin tài khoản
+                    </a>
+                    <a class="dropdown-item" href="https://drfblog.github.io/admin/change_password">
+                        Đổi mật khẩu
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" onclick="logOut()">
+                        Đăng xuất
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+  <div class="mt-3 container">
+  <template>
+    <form id='fmt' @submit.prevent="save()">
+        <table class="table" style="border-bottom: 1px solid #dee2e6;">
+            <tr>
+                <th>Thêm Ảnh :</th>
+                <td><input class="formData mb-3" type="file" class="form-control" name="image"></td>
+                <td><button  class="btn btn-primary" type="submit">Thêm</button></td>
+            </tr>
+        </table>
+    </form>
+    <p class="text-center" style="color: crimson;">{{ok}}</p>
+    <table class="table table-bordered">
+        <tr class="text-center">
+            <th style="width: 10%;">STT</th>
+            <th style="width: 60%;">Ảnh</th>
+            <th style="width: 30%;">sao chép</th>
+        </tr>
+        <tr v-for='(md,i) in media.body' class="text-center">
+            <td>{{i+1}}</td>
+            <td><img  :src="md.image" class="form" style="width: 150px;"><br v-if="user.body.author_photo">
+                <input type="text" class="form-control mt-3" :value="md.image" :id="i+1" style="width: 100%;">
+            </td>
+            <td>
+                <button class="btn btn-info" v-on:click="coppyText(i+1)">Copy link</button>
+                <button class="btn btn-danger" v-on:click="deleteImage(md.id)">Xóa ảnh</button>
+            </td>
+        </tr>
+    </table>
+    <b-pagination v-model="paging.currentPage" :total-rows="paging.count" :per-page="perPage"
+    v-on:input="getImageList(url2+paging.currentPage)">
+    </b-pagination>
+    <p class="mt-3">Trang hiện tại: {{ paging.currentPage }}</p>
+  </template>
+</div>
+</div>
+<script>
+
+  new Vue({
+    el: '#app',
+    data(){
+      return {
+        ok:'',
+        media:'',
+        perPage: 5,
+        paging: {
+            currentPage: "1",
+            count: "",
+            previous: "",
+            next: "",
+            total_page: "",
+        },
+        categories: [],
+        API_URL :'https://drfblog.herokuapp.com',
+        url:'https://drfblog.herokuapp.com/root/get_list_media',
+        url2:'https://drfblog.herokuapp.com/root/get_list_media?page=',
+        user: {
+                body:{
+                    author_photo:"",
+                    author_id:"",
+                }}
+      }
+    },
+
+    methods: {
+        getUser: async function(){
+            var resp = await fetch(this.API_URL+"/root/get_user",
+                    {
+                        headers: {'Authorization': 'Bearer ' + sessionStorage.getItem('token'), "Content-Type": "application/json",}
+                    });
+                    this.user = await resp.json()
+                    if(this.user.body.success === false){
+                        sessionStorage.removeItem('token');
+                        location.href = 'login.html';
+                    }
+          },
+        getImageList:async function(url){
+            var resp = await fetch(url,
+                    {
+                        headers: {'Authorization': 'Bearer ' + sessionStorage.getItem('token'), "Content-Type": "application/json",}
+                    });
+                    this.media = await resp.json();
+                    this.paging = this.media.paging;
+                    window.scrollTo(0,0);
+        },
+        coppyText:async function(id) {
+            var copyText = document.getElementById(id);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999)
+            document.execCommand("copy");
+            this.ok = 'Đã copy ảnh số ' +id
+            },
+        post: async function (url, formData) {
+            var resp = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': 'Bearer '
+                        + sessionStorage.getItem('token')
+                },
+            });
+            return resp.json();
+        },
+        save: async function(){
+            var result = {};
+            var fmt = document.getElementById('fmt');
+            var data = new FormData(fmt);
+            if (this.user.body.author_id) {
+                result = await this.post(this.API_URL + '/root/create_media',data);
+            }
+            if (result.body.success) {
+                location.href = 'media.html';
+                alert('Thêm thành công');
+            }else {
+                alert('Lỗi xảy ra khi ghi dữ liệu');
+            }
+        },
+        deleteImage: async function (id) {
+                if (confirm("Bạn có thực sự muốn xóa !")) {
+                    var resp = await fetch(this.API_URL + '/root/delete_media/' + id,
+                        {method: 'DELETE'});
+                    var result = await resp.json();
+                    if (result.body.success) {
+                        alert('Xóa Thành công');
+                        location.href = 'https://drfblog.herokuapp.com/admin/media';
+
+                    } else {
+                        alert('Lỗi khi xóa ');
+                    }
+                    ;
+                }
+                ;
+            },
+
+    },
+    created: async function () {
+      await this.getUser();
+      await this.getImageList(this.url);
+    }
+  })
+</script>
