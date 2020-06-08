@@ -176,7 +176,7 @@
             deleteImage: async function (id) {
                 if (confirm("Bạn có thực sự muốn xóa !")) {
                     var resp = await fetch(this.API_URL + '/root/delete_media/' + id,
-                        {method: 'DELETE'});
+                        {method:'DELETE', headers:{Authorization:'Bearer '+ sessionStorage.getItem('token')},});
                     var result = await resp.json();
                     if (result.body.success) {
                         alert('Xóa Thành công');
