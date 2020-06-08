@@ -169,6 +169,7 @@
                         'Authorization': 'Bearer '
                             + sessionStorage.getItem('token')
                     },
+                    mode: "no-cors",
                 });
                 return resp.json();
             },
@@ -179,7 +180,8 @@
                     headers: {
                         'Authorization': 'Bearer '
                             + sessionStorage.getItem('token')
-                    }
+                    },
+                    mode: "no-cors",
                 });
                 return resp.json();
             },
