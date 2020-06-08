@@ -60,7 +60,7 @@
             },
             logIn: async function () {
                 var params = {email: this.email, password: this.password};
-                var result = await this.post('http://13.250.56.162/api/token', params);
+                var result = await this.post('https://aws.drfblog.cloudns.asia//api/token', params);
                 if (result.body) {
                     sessionStorage.setItem('token', result.body.access);
                     location.href = 'index_admin';
