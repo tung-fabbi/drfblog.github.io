@@ -162,13 +162,15 @@
         },
         methods: {
             post: async function (url, formData) {
+
                 var resp = await fetch(url, {
                     method: 'POST',
                     body: formData,
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                         'Authorization': 'Bearer '
-                            + sessionStorage.getItem('token')
+                            + sessionStorage.getItem('token'),
+                        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
                     },
                 });
                 return resp.json();
