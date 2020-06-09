@@ -167,9 +167,10 @@
                     method: 'POST',
                     body: formData,
                     headers: {
+						'Access-Control-Allow-Origin':'*',
                         'Authorization': 'Bearer '
                             + sessionStorage.getItem('token')
-                    },
+                    },mode: "no-cors",
                 });
                 return resp.json();
             },
