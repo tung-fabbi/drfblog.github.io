@@ -169,8 +169,7 @@
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                         'Authorization': 'Bearer '
-                            + sessionStorage.getItem('token'),
-                        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+                            + sessionStorage.getItem('token')
                     },
                 });
                 return resp.json();
