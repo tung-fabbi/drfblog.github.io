@@ -110,8 +110,8 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'Authorization': 'Bearer '
-                            + sessionStorage.getItem('token')
+                        'Authorization': 'Bearer '+ sessionStorage.getItem('token'),
+						"Content-Type": "application/json",
                     },mode: 'no-cors'
                 });
                 return resp.json();
