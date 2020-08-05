@@ -95,9 +95,8 @@
                 var resp = await fetch(this.API_URL + "/root/get_user",
                     {
                         headers: {
-                            'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
-                            "Content-Type": "application/json",
-                        },mode: 'no-cors'
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                        }
                     });
                 this.user = await resp.json();
                 if (this.user.body.success === false) {
