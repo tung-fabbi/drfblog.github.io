@@ -54,13 +54,13 @@
                         <td><input class="form-control" v-model="category.body.title" name="title"></td>
                     </tr>
                 </table>
-                <a class='btn btn-secondary' href='https://aws.drfblog.cloudns.asia/admin/category_list'>Quay lại</a>
+                <a class='btn btn-secondary' href='https://drfblog.github.io/admin/category_list/'>Quay lại</a>
                 <button class="btn btn-primary" type="submit">Lưu lại</button>
             </form>
         </template>
     </div>
 </div>
-<script>
+<script>s
     new Vue({
         el: '#app',
         data: {
@@ -97,7 +97,7 @@
                         headers: {
                             'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
                             "Content-Type": "application/json",
-                        }
+                        },{ mode: 'no-cors'}
                     });
                 this.user = await resp.json();
                 if (this.user.body.success === false) {
