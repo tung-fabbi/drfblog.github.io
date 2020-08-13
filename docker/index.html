@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker-Basic</title>
+</head>
+<body>
+  <pre style="font-size: 17px;">
+---------------------------------------Giới thiệu về Docker--------------------------------------------
+-Docker là một dự án mã nguồn mở giúp tự động triển khai các ứng dụng Linux và Windows vào trong các container ảo hóa.
+-Image : là các bộ cài như Centos,MySQL,ubutu...
+-Docker Hub : Noi quản lý các image giống như Github
+-Container:Là máy ảo tạo ra từ Image
+-Dockerfile:là một tập tin bao gồm các chỉ dẫn để build một image
+-volume : Lưu data ra ngoài container
+-Docker-compose : Edit dockerfile, dùng để chạy multi container đồng thời 
+-Docker networks : Docker container có IP , Docker network để kết nối các container trong cùng mạng hoặc khác mạng với nhau
+
+-------------------------------------------------------------------------------------------------
+🏃🏼‍♀️ Lab document
+Các lệnh với image
+- Tìm image để cài đặt
+docker search centos
+- List các image đang có
+docker image ls
+- Xóa image
+sudo docker rmi [Image ID]
+Chú ý: Các image mà có container đang chạy thì sẽ không xóa được mà phải xóa container liên quan tới nó trước
+- Pull image về
+docker pull centos:7
+
+Làm việc với container
+
+- Chạy 1 container từ image
+ docker run --privileged -d -p 80:80 hello-world /sbin/init
+ docker run --privileged -d -p 172.0.0.1:80 centos:7 /sbin/init
+ docker run --privileged -d -p 127.0.0.1:8080:80 tungns2101/project01:v1 /sbin/init
+
+- Vào container để chạy lệnh
+docker exec -it [Container ID] /bin/bash 
+
+- Cài đặt apache
+yum -y install httpd
+systemctl start httpd
+systemctl enable httpd
+
+echo "Hello Tin Hoc That La Don Gian" > /var/www/html/index.html
+
+- Thoát ra khỏi container
+exit
+
+- Tạo image để triển khai cho máy khác
+docker commit -m "Comment" -a "Tác giả"  [Container ID] [Image Name]
+docker commit -m "Centos Project01" -a "Nguyen Son Tung" 17d5e6b7a986 tungns/project01:v1
+
+- Đăng nhập vào docker/hub
+docker login
+
+- Đưa image lên docker hup để mọi người cùng sử dụng
+docker push [Tên image]
+docker push tungns2101/project01:v1
+ 
+- Check các container đang chạy
+sudo docker ps -a
+
+- Xem trạng thái container
+docker container ls -a
+
+- Xóa containner
+sudo docker rm [Container ID]
+
+- Stop container
+docker container stop [Container ID]
+
+- Restart container
+docker container restart [Container ID]
+
+- Pause container
+docker container pause  [Container ID]
+
+- Truy cập vào các container đang chạy
+docker container attach [Container ID]
+
+
+- Lệnh stop toàn bộ container
+docker stop $(docker ps -a -q)
+
+- Lệnh xóa toàn bộ container
+docker rm $(docker ps -a -q)
+
+- Lệnh xóa toàn bộ image
+docker rmi -f $(docker images -a -q)
+<hr>
+--------------------------------------Dockerfile-------------------------------------------------------
+FROM:  lấy 1 image trên docker hub
+LABEL: Thông tin người bảo trì dockerfile
+ENV : Thiết lập một biến môi trương
+RUN : Chỉ chạy khi build Image, được sử dụng để cài đặt các package vào trong container
+COPY : sao chép các file và thư mục vào trong container 
+ADD : sao chép các file và thư mục vào trong container 
+CMD : trong 1 Dockerfile chỉ có 1 CMD , chỉ chạy khi thục hiện run để tạo ra 1 container
+WORKDIR : Thiết lập thư mục làmviệccho các chỉ thị khác như :RUN , CMD, ENTRYPOINT, COPY, ADD, ...
+ARG : Định nghĩa các giá trị biến được dùng trong lúcbuild image
+ENTRYPOINT : cung cấp các lệnh và đôi số cho một container thực thi
+EXPOSE : Khai báo port lắng nghe của image 
+VOLUME : tạo một điểm ngắn như thư mục để truy cập và lưu trữ data
+++++++++++++++++++++++
+🏃🏼‍♀️ Lab document
+1. Tạo Dockerfile
+
+# Get base image
+FROM centos:7
+
+# Author
+MAINTAINER "Nguyen Quoc Bao"
+
+#Cai dat apache
+RUN yum update -y
+RUN yum install -y sudo
+RUN yum install -y epel-release
+RUN yum install -y http://rpms.famillecollet.com/enterpr...
+RUN yum clean all
+RUN yum -y install wget
+RUN yum -y install httpd
+RUN yum -y install --enablerepo=remi,remi-php71 php php-devel php-mbstring php-pdo php-gd php-xml php-mcrypt php-pgsql
+ 
+#Thiet lap thu muc lam viec 
+WORKDIR /var/www/html
+
+#copy code tu thu muc code vao image
+ADD ./code /var/www/html
+
+# start httpd
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+
+EXPOSE 80
+
+
+2. Build image
+docker build -t httpd_sample . (httpd_sample là tên image còn '.'  là call đến file dockerfile hiện tại)
+
+3. Tạo và chạy container
+docker run -d -p 80:80 httpd_sample
+<hr>
+---------------------------------Docker Compose ---------------------------------------------------
+version : Chỉ ra phiên bản docker-compose đã sử dụng 
+services : thiết lập các services(containers) muốn cài đặt và chạy 
+iamge : chỉ ra images được sử dụng trong lúc tạo ra container
+build : dùng để tạo container (map tới dockerfile)
+ports : thiết lập posts chạy tại máy host và trong container
+restart: tự khởi động chạy khi container bị tắt
+environment : thiết lập biến môi trường (thường sử dụng trong lúc config các thông số của db)
+depends_on : chỉ ra sự phụ thuộc . tức là container nào phải được cài đặt và chạy trước thì container được config tại đó mới được chạy
+volumes: Dùng để mount  hai thư mục host và container với nhau 
+links : Cho phép đăng kí một cái tên bí danh để cho các server khác có thể gọi .Điều đặc biệt là có thể đem lại một cái tên "hợp vệ  sinh",
+chúng ta không cần phải nhớ truy cập trên cổng nào như trên host 
+Chỉ cần sử dụng tên là có thể kết  nối với service mong muốn.
+Context : xác định thư mục chức gốc . Dựa vào thư mục này chúng ta khái báo tiếp đường dẫn dockerfile
++++++++++++++++++++++++++++++++++++++++++++++
+1. Cài EC2
+#!/bin/bash
+yum update -y
+yum install -y docker
+service docker start
+chkconfig docker on
+curl -L "https://github.com/docker/compose/releases/download/1.11.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+
+Sample
+
+1. Tạo file Dockerfile
+
+FROM centos:7
+RUN yum -y update && \
+    yum -y install httpd php
+WORKDIR /var/www/html
+ADD ./code /var/www/html
+EXPOSE 80
+
+2.Tạo file docker-compose.yml
+version: '3'
+services:                                                                                       
+  web:                                                                                          
+    build: .
+	command: ["/usr/sbin/httpd","-D","FOREGROUND"]           
+    ports:                                                                                      
+      - "80:80"
+	  
+	  
+- Build image
+$ docker-compose build
+
+- Chạy container
+$ docker-compose up -d
+
+- Stop
+$ docker-compose stop
+
+- Start lại container
+$ docker-compose start
+
+- Stop và xóa container
+$ docker-compose down
+
+https://github.com/dockersamples/example-voting-app
+<hr>
+------------------------------------------------Thực hành AWS/ECS-----------------------------------------------
+
+1. Cài EC2
+#!/bin/bash
+yum update -y
+yum install -y docker
+service docker start
+chkconfig docker on
+curl -L "https://github.com/docker/compose/releases/download/1.11.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+
+$ mkdir nginx
+$ cd nginx
+$ vi Dockerfile
+FROM nginx
+COPY html /usr/share/nginx/html
+
+
+$ mkdir html
+$ vi html/index.html
+###
+{html>
+{head>{title>Tin hoc that la don gian{/title>{/head>
+{body>{h1>Xin chao tin hoc that la don gian{/h1>{/body>
+{/html>
+####
+
+$docker build -t [Image Name]:tag .
+	->docker build -t tinhocthatladongian:v1 .
+
+- AWS ECR Login
+aws ecr get-login --no-include-email --region eu-west-2
+
+
+- Tạo repository lên AWS/ECR(Amazon Elastic Container Registry)
+aws ecr create-repository --repository-name [Repository Name] --region eu-west-2
+->aws ecr create-repository --repository-name tinhocthatladongian --region eu-west-2
+
+
+- Tạo tag version docker image
+docker tag [Image Name]:tag [Repository ULR] đã tạo ra ở bước trên]
+->docker tag tinhocthatladongian:v1 251123607109.dkr.ecr.eu-west-2.amazonaws.com/tinhocthatladongian
+
+- Push lên AWS/ECR
+docker push [Repository ULR]
+->docker push 251123607109.dkr.ecr.eu-west-2.amazonaws.com/tinhocthatladongian
+
+- Tạo Task trên AWC/ECS
+- Tạo Clusters trên AWC/ECS
+
+Các lệnh xóa đồng loạt
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi -f $(docker images -a -q)
+  </pre>
+</body>
+</html>
