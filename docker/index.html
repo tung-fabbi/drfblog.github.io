@@ -7,7 +7,7 @@
 </head>
 <body>
   <pre style="font-size: 17px;">
----------------------------------Giới thiệu-------------------------------------
+---------------------------------<h1>Giới thiệu</h1>-------------------------------------
 -Docker là một dự án mã nguồn mở giúp tự động triển khai các ứng dụng Linux và Windows vào trong các container ảo hóa.
 -Image : là các bộ cài như Centos,MySQL,ubutu...
 -Docker Hub : Noi quản lý các image giống như Github
@@ -93,7 +93,7 @@ docker rm $(docker ps -a -q)
 
 - Lệnh xóa toàn bộ image
 docker rmi -f $(docker images -a -q)
---------------------------------------Dockerfile---------------------------------
+--------------------------------------<h1>Dockerfile</h1>---------------------------------
 FROM:  lấy 1 image trên docker hub
 LABEL: Thông tin người bảo trì dockerfile
 ENV : Thiết lập một biến môi trương
@@ -143,7 +143,7 @@ docker build -t httpd_sample . (httpd_sample là tên image còn '.'  là call �
 
 3. Tạo và chạy container
 docker run -d -p 80:80 httpd_sample
----------------------------------Docker Compose --------------------------
+---------------------------------<h1>Docker Compose</h1> --------------------------
 version : Chỉ ra phiên bản docker-compose đã sử dụng 
 services : thiết lập các services(containers) muốn cài đặt và chạy 
 iamge : chỉ ra images được sử dụng trong lúc tạo ra container
@@ -204,7 +204,7 @@ $ docker-compose start
 $ docker-compose down
 
 https://github.com/dockersamples/example-voting-app
-------------------------------------------------Docker volume - Docker networks----------------------------------------
+------------------------------------------------<h1>Docker volume - Docker networks</h1>----------------------------------------
 https://xuanthulab.net/chia-se-du-lieu-giua-docker-host-va-container.html
 1. Volume
 - Docker volume : là  một nơi lưu trữ data nằm ngoài container , mục đích không làm mất data khi xóa container 
@@ -428,7 +428,7 @@ MYSQL_DATABASE=wordpress
 MYSQL_USER=admin
 MYSQL_PASSWORD=pass
 
-------------------------------------------------AWS/ECS----------------------------------------
+------------------------------------------------<h1>AWS/ECS</h1>----------------------------------------
 
 Thực hành AWS/ECS
 
