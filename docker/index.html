@@ -451,10 +451,10 @@ COPY html /usr/share/nginx/html
 
 $ mkdir html
 $ vi html/index.html
-<html>
-<head><title>Tin hoc that la don gian</title></head>
-<body><h1>Xin chao tin hoc that la don gian</h1></body>
-</html>
+#{html}
+#{head}<title>Tin hoc that la don gian{/title}{/head}
+#{body}<h1>Xin chao tin hoc that la don gian{/h1}{/body}
+#{/html}
 
 
 $docker build -t [Image Name]:tag .
