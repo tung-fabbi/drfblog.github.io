@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker-Basic</title>
+</head>
+<body>
+  <pre style="font-size: 17px;">
+    -----------------Elasticsearch--------------------
+    curl -XGET localhost:9200 -> test
+    
+    GET /_cat/indices?v -> kiểm tra trạng thái, tham số "v" để hiện thị chi tiết
+    
+    PUT /[name_index]?pretty -> tao index,pretty để hiện kết quả trình bày dễ đọc
+    
+    DELETE /[name_index]?pretty -> xóa index với kết quả trả về pretty dễ đọc
+    
+    - nếu sử dụng curl :
+      + curl -XDELETE "http://localhost:9200/[name_index]?pretty"
+      + curl -XGET "http://localhost:9200/_cat/indices?v"
+    
+    - lưu tài liệu mới bằng curl :
+      curl -XPUT "http://elasticsearch:9200/students/_doc/1" -H 'Content-Type: application/json' -d'
+      {
+        "name":"Nguyen Son Tung",
+        "age":23
+      }'
+    
+      PUT /student/_doc/4
+      {
+      "name":"Nguyen Son Tung",
+        "age":23
+      }
+    
+    - đọc dữ liệu sử dụng curl:
+      + curl -XGET "http://elasticsearch:9200/students/_doc/1?pretty"
+      + GET /student/_doc/2?pretty
+    
+    - update 1 _doc:
+      + curl -XGET "http://elasticsearch:9200/students/_doc/2?pretty"
+      + GET /students/_doc/2?pretty
+    
+    - delete 1 _doc:
+      + DELETE /student/_doc/id
+      + curl -XDELETE "http://elasticsearch:9200/students/_doc/1"
+    
+    ------------- Tạo mới hoặc cập nhật cho 1 loạt doc--------
+    POST /_bulk
+    {"index":{"_index":"students","_id":4}}
+    {"name":"Tri Mai","age":27}
+    {"index":{"_index":"students","_id":5}}
+    {"name":"MC","age":22}
+    {"index":{"_index":"students","_id":6}}
+    {"name":"Tit","age":0.9}
+    
+    --------
+    curl -XPOST "http://elasticsearch:9200/_bulk" -H 'Content-Type: application/json' -d'
+    {"index":{"_index":"students","_id":4}}
+    {"name":"Tri Mai","age":27}
+    {"index":{"_index":"students","_id":5}}
+    {"name":"MC","age":22}
+    {"index":{"_index":"students","_id":6}}
+    {"name":"Tit","age":0.9}
+    '
+    
+    ----------------------------THỰC HIỆN TRUY VẤN VỚI ELASTICSEARCH----------------
+    -Download data demo
+    https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json
+    
+    - chạy lệnh :
+    curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_bulk?pretty&refresh" --data-binary "@accounts.json"
+    curl "localhost:9200/_cat/indices?v"
+    
+    -> tham số -H để thiết lập header, index tên là bank nếu ko có tự tạo,_bulk để tạo nhiều data,
+    
+    -------Thực hiện truy vấn tìm kiếm------
+    - truy vấn tất cả:
+    GET /bank/_search
+    {
+      "query": {"match_all": {}}
+    }
+    - hoặc
+    curl -XGET "http://elasticsearch:9200/bank/_search?pretty" -H 'Content-Type: application/json' -d'
+    {
+      "query": {"match_all": {}},
+      "size": 100
+    }'
+    
+    ---------------------------------
+    - size là số lượng phần tử trả về
+    - from : bắt đầu từ phẩn tử thứ 5
+    - sort sắp xếp theo field balence, từ desc
+    
+    GET /bank/_search
+    {
+      "query": {"match_all": {}},
+      "size": 100,
+      "from": 5,
+      "sort": [
+        {
+          "balance":{
+            "order": "desc"
+          }
+        }
+      ]
+    }
+    
+    --------------------------------------
+    - match: tìm chính xác
+    
+    GET /bank/_search
+    {
+      "query": {"match": {
+        "account_number":20
+      }}
+    }
+    ------------------------------------
+    - _source : lấy 2 field trả về 
+    
+    GET /bank/_search
+    {
+      "query": {"match_all": {}},
+      "_source": ["account_number","balance"]
+    }
+    
+    
+    -----------------------------------------
+    bool - must : tìm kiếm theo nhiều điều kiện phải có đầy đủ mill và lane (phép toán and)
+    bool - should : tìm kiếm hoặc có mill hoặc có lane (phép toán or)
+    bool - must_not : tìm kiếm phủ định
+    
+    
+    GET /bank/_search
+    {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "address": "mill"
+              }
+            },
+            {
+              "match": {
+                "address": "lane"
+              }
+            }
+          ]
+        }
+      }
+    }
+    
+    GET /bank/_search
+    {
+      "query": {
+        "bool": {
+          "must_not": [
+            {
+              "match": {
+                "address": "mill"
+              }
+            },
+          ]
+          , "must": [
+            {
+              "city":"Dante"
+            }
+          ]
+        }
+      }
+    }
+    
+    ------------------------------------------------------------------------------------
+    https://xuanthulab.net/lap-trinh-chuc-nang-tim-kiem-trong-php-voi-elasticsearch.html
+    ------------------------------------------------------------------------------------    
+  </pre>
+</body>
+</html>
